@@ -104,6 +104,31 @@ paths:
           description: Invalid request body
         '404':
           description: Customer not found
+  /customers/{id}/addresses/{addressId}:
+    get:
+      summary: Verify a specific address for a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: addressId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Address exists for this customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+        '404':
+          description: Address not found or does not belong to this customer
 
 components:
   schemas:

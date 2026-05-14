@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Order Service API
+  version: 1.0.0
+  description: API for managing the order lifecycle and event-driven processing.
+
+paths:
+  /orders:
+    post:
+      summary: Create a new order
+      description: |
+        Creates a new order. Requires a valid customerId and addressId.
+        The service will synchronously validate these against the Customer Service.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Unique UUID to prevent duplicate order creation.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid input
+        '404':
+          description: Customer or address not found
+
+    get:
+      summary: List all orders
+      parameters:
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /orders/{id}:
+    get:
+      summary: Get order details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found
+
+  /orders/{id}/status:
+    patch:
+      summary: Update order status
+      description: Transitions status between created, shipped, or cancelled. Triggers a Kafka event.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+      responses:
+        '200':
+          description: Status successfully updated
+        '400':
+          description: Invalid status transition
+        '404':
+          description: Order not found
+
+components:
+  schemas:
+    Order:
+      type: object
+      required:
+        - id
+        - customerId
+        - addressId
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        addressId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - customerId
+        - addressId
+      properties:
+        customerId:
+          type: string
+          format: uuid
+        addressId:
+          type: string
+          format: uuid
+
+    UpdateStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+
+    OrderStatus:
+      type: string
+      enum:
+        - CREATED
+        - SHIPPED
+        - CANCELLED
