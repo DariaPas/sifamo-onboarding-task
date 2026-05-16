@@ -38,6 +38,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+		
+		
+		<dependency>
+    		<groupId>io.swagger.core.v3</groupId>
+    		<artifactId>swagger-annotations-jakarta</artifactId>
+    		<version>2.2.25</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.openapitools</groupId>
+    		<artifactId>jackson-databind-nullable</artifactId>
+    		<version>0.2.6</version>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -115,6 +129,52 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+    			<groupId>org.openapitools</groupId>
+    			<artifactId>openapi-generator-maven-plugin</artifactId>
+    			<version>7.10.0</version>
+    			<executions>
+        			<execution>
+            			<id>order-server</id>
+            			<goals>
+                			<goal>generate</goal>
+            			</goals>
+            			<configuration>
+                			<inputSpec>${project.basedir}/src/main/resources/openapi/order-api.yaml</inputSpec>
+                			<generatorName>spring</generatorName>
+                			<apiPackage>com.sifamo.order.api</apiPackage>
+                			<modelPackage>com.sifamo.order.api.model</modelPackage>
+                			<generateSupportingFiles>false</generateSupportingFiles>
+                			<configOptions>
+                    			<interfaceOnly>true</interfaceOnly>
+                    			<useSpringBoot3>true</useSpringBoot3>
+                    			<useTags>true</useTags>
+                    			<skipDefaultInterface>true</skipDefaultInterface>
+                    			<useJakartaEe>true</useJakartaEe>
+                			</configOptions>
+            			</configuration>
+        			</execution>
+        			<execution>
+            			<id>customer-client</id>
+            			<goals>
+                			<goal>generate</goal>
+            			</goals>
+            			<configuration>
+                			<inputSpec>${project.basedir}/src/main/resources/openapi/customer-api.yaml</inputSpec>
+                			<generatorName>java</generatorName>
+                			<library>restclient</library>
+                			<apiPackage>com.sifamo.order.client.customer.api</apiPackage>
+                			<modelPackage>com.sifamo.order.client.customer.model</modelPackage>
+                			<invokerPackage>com.sifamo.order.client.customer</invokerPackage>
+                			<generateSupportingFiles>true</generateSupportingFiles>
+                			<configOptions>
+                    			<useJakartaEe>true</useJakartaEe>
+                    			<dateLibrary>java8</dateLibrary>
+                			</configOptions>
+            			</configuration>
+        			</execution>
+    			</executions>
 			</plugin>
 		</plugins>
 	</build>
