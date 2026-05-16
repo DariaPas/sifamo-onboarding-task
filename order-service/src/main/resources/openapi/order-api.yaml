@@ -9,7 +9,7 @@ paths:
     post:
       summary: Create a new order
       description: |
-        Creates a new order. Requires a valid customerId and addressId.
+        Creates a new order. Requires a valid customerId and shipping addressId.
         The service will synchronously validate these against the Customer Service.
       parameters:
         - name: Idempotency-Key
@@ -96,6 +96,10 @@ paths:
       responses:
         '200':
           description: Status successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Invalid status transition
         '404':
@@ -108,7 +112,7 @@ components:
       required:
         - id
         - customerId
-        - addressId
+        - shippingAddressId
         - status
         - createdAt
         - items
@@ -119,7 +123,7 @@ components:
         customerId:
           type: string
           format: uuid
-        addressId:
+        shippingAddressId:
           type: string
           format: uuid
         status:
@@ -137,13 +141,13 @@ components:
       type: object
       required:
         - customerId
-        - addressId
+        - shippingAddressId
         - items
       properties:
         customerId:
           type: string
           format: uuid
-        addressId:
+        shippingAddressId:
           type: string
           format: uuid
         items:
