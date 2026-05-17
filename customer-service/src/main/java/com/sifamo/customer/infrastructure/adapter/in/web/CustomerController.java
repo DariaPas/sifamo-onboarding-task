@@ -6,11 +6,15 @@ import com.sifamo.customer.api.model.Customer;
 import com.sifamo.customer.api.model.CreateCustomerRequest;
 import com.sifamo.customer.api.model.CreateShippingAddressRequest;
 import com.sifamo.customer.api.model.ShippingAddress;
+import com.sifamo.customer.application.port.in.AddShippingAddressCommand;
+import com.sifamo.customer.application.port.in.AddShippingAddressUseCase;
 import com.sifamo.customer.application.port.in.BillingAddressCommand;
 import com.sifamo.customer.application.port.in.CreateCustomerCommand;
 import com.sifamo.customer.application.port.in.CreateCustomerUseCase;
 import com.sifamo.customer.application.port.in.GetCustomerUseCase;
+import com.sifamo.customer.application.port.in.GetShippingAddressUseCase;
 import com.sifamo.customer.application.port.in.ListCustomersUseCase;
+import com.sifamo.customer.application.port.in.ListShippingAddressesUseCase;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,14 +28,26 @@ public class CustomerController implements DefaultApi {
 	 private final CreateCustomerUseCase createCustomerUseCase;
 	 private final ListCustomersUseCase listCustomersUseCase;
 	 private final GetCustomerUseCase getCustomerUseCase;
+	 
+	 private final AddShippingAddressUseCase addShippingAddressUseCase;
+	 private final ListShippingAddressesUseCase listShippingAddressesUseCase;
+	 private final GetShippingAddressUseCase getShippingAddressUseCase;
+	 
 	
 	public CustomerController(CreateCustomerUseCase createCustomerUseCase,
             ListCustomersUseCase listCustomersUseCase,
-            GetCustomerUseCase getCustomerUseCase
+            GetCustomerUseCase getCustomerUseCase,
+            AddShippingAddressUseCase addShippingAddressUseCase,
+            ListShippingAddressesUseCase listShippingAddressesUseCase,
+            GetShippingAddressUseCase getShippingAddressUseCase
     ) {
 		this.createCustomerUseCase = createCustomerUseCase;
         this.listCustomersUseCase = listCustomersUseCase;
         this.getCustomerUseCase = getCustomerUseCase;
+        
+        this.addShippingAddressUseCase = addShippingAddressUseCase;
+        this.listShippingAddressesUseCase = listShippingAddressesUseCase;
+        this.getShippingAddressUseCase = getShippingAddressUseCase;
     }
 
     @Override
@@ -72,15 +88,30 @@ public class CustomerController implements DefaultApi {
 
     @Override
     public ResponseEntity<List<ShippingAddress>> customersIdShippingAddressesGet(UUID id) {
-        return ResponseEntity.ok(List.of());
+    	List<ShippingAddress> shippingAddresses = listShippingAddressesUseCase.listShippingAddresses(id)
+                .stream()
+                .map(this::toApiShippingAddress)
+                .toList();
+
+        return ResponseEntity.ok(shippingAddresses);
     }
 
     @Override
     public ResponseEntity<ShippingAddress> customersIdShippingAddressesPost(
             UUID id,
-            CreateShippingAddressRequest createShippingAddressRequest
+            CreateShippingAddressRequest request
     ) {
-        return ResponseEntity.status(201).build();
+    	AddShippingAddressCommand command = new AddShippingAddressCommand(
+                request.getStreet(),
+                request.getCity(),
+                request.getPostalCode(),
+                request.getCountry()
+        );
+
+        com.sifamo.customer.domain.model.ShippingAddress createdShippingAddress =
+                addShippingAddressUseCase.addShippingAddress(id, command);
+
+        return ResponseEntity.status(201).body(toApiShippingAddress(createdShippingAddress));
     }
 
     @Override
@@ -88,7 +119,9 @@ public class CustomerController implements DefaultApi {
             UUID id,
             UUID shippingAddressId
     ) {
-        return ResponseEntity.notFound().build();
+    	return getShippingAddressUseCase.getShippingAddress(id, shippingAddressId)
+                .map(shippingAddress -> ResponseEntity.ok(toApiShippingAddress(shippingAddress)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     private Customer toApiCustomer(com.sifamo.customer.domain.model.Customer domainCustomer) {
@@ -110,5 +143,18 @@ public class CustomerController implements DefaultApi {
         apiCustomer.setBillingAddress(apiBillingAddress);
 
         return apiCustomer;
+    }
+    
+    private ShippingAddress toApiShippingAddress(
+            com.sifamo.customer.domain.model.ShippingAddress domainShippingAddress
+    ) {
+        ShippingAddress apiShippingAddress = new ShippingAddress();
+        apiShippingAddress.setId(domainShippingAddress.getId());
+        apiShippingAddress.setStreet(domainShippingAddress.getStreet());
+        apiShippingAddress.setCity(domainShippingAddress.getCity());
+        apiShippingAddress.setPostalCode(domainShippingAddress.getPostalCode());
+        apiShippingAddress.setCountry(domainShippingAddress.getCountry());
+
+        return apiShippingAddress;
     }
 }
