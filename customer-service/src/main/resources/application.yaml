@@ -3,6 +3,15 @@ server:
 spring:
   application:
     name: customer-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sifamo_onboarding
+    username: customer_app
+    password: customer_password
 
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: customer_schema
+
