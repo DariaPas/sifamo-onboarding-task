@@ -1,23 +1,51 @@
-## Current Status
+## Current status
 
-- `customer-service` and `order-service` project skeletons created
-- Initial hexagonal/layered package structure added
-- OpenAPI specifications created and validated with Swagger Editor
-- Basic test endpoints added for local startup verification
+Implemented so far:
 
-## OpenAPI Specifications
+- Customer OpenAPI spec adjusted
+- Order OpenAPI spec adjusted
+- OpenAPI Generator configured for Customer Service
+- OpenAPI Generator configured for Order Service
+- Docker Compose setup added for local infrastructure
+- Postgres starts with three schemas/users
+- Kafka starts in KRaft mode
+- Kafka UI starts and shows the local Kafka cluster online
+- Customer Service connects to `customer_schema`
+- Customer Service has a first implementation
+- Customer endpoints for Customer, BillingAddress and ShippingAddress are working
 
-Customer Service:
+---
+
+## OpenAPI changes
+
+### Customer Service
+
+The address model is now split into two different concepts:
+
+#### BillingAddress
+
+- Exactly one billing address per customer
+- Created together with the customer
+- Required in `CreateCustomerRequest`
+- Modeled as a 1:1 relationship
+
+#### ShippingAddress
+
+- One customer can have multiple shipping addresses
+- Managed through separate endpoints
+- Modeled as a 1:n relationship
+
+### OrderService
+
+- Order and CreateOrderRequest now contains an items list
+- Contains a copy of:  order-service/src/main/resources/openapi/customer-api.yaml
+
+Current Customer working endpoints:
+
 ```text
-customer-service/src/main/resources/openapi/customer-api.yaml
-```
-Order Service:
-```text
-order-service/src/main/resources/openapi/order-api.yaml
-```
-## Notes
-Customer Service contains an additional endpoint for validating whether an address belongs to a specific customer:
-```text
-GET /customers/{id}/addresses/{addressId}
-```
-Notification Service is currently planned as a Kafka consumer without a dedicated REST API.
+POST /customers
+GET /customers
+GET /customers/{id}
+POST /customers/{id}/shipping-addresses
+GET /customers/{id}/shipping-addresses
+GET /customers/{id}/shipping-addresses/{shippingAddressId}
