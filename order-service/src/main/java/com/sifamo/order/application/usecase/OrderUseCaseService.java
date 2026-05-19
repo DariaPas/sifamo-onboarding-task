@@ -18,18 +18,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
+import com.sifamo.order.application.port.out.CustomerValidationPort;
+
 @Service
 public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCase, GetOrderUseCase {
 
     private final OrderRepositoryPort orderRepositoryPort;
+    private final CustomerValidationPort customerValidationPort;
 
-    public OrderUseCaseService(OrderRepositoryPort orderRepositoryPort) {
+    public OrderUseCaseService(OrderRepositoryPort orderRepositoryPort, CustomerValidationPort customerValidationPort) {
         this.orderRepositoryPort = orderRepositoryPort;
+        this.customerValidationPort = customerValidationPort;
     }
 
     @Override
     @Transactional
     public Order createOrder(UUID idempotencyKey, CreateOrderCommand command) {
+    	
+    	if (!customerValidationPort.customerExists(command.customerId())) {
+    	    throw new IllegalArgumentException("Customer not found: " + command.customerId());
+    	}
+
+    	if (!customerValidationPort.shippingAddressExists(command.customerId(), command.shippingAddressId())) {
+    	    throw new IllegalArgumentException("Shipping address not found: " + command.shippingAddressId());
+    	}
+    	
         List<OrderItem> items = command.items()
                 .stream()
                 .map(this::toDomainItem)
