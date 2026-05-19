@@ -5,6 +5,7 @@ import com.sifamo.order.application.port.in.CreateOrderItemCommand;
 import com.sifamo.order.application.port.in.CreateOrderUseCase;
 import com.sifamo.order.application.port.in.GetOrderUseCase;
 import com.sifamo.order.application.port.in.ListOrdersUseCase;
+import com.sifamo.order.application.port.in.UpdateOrderStatusUseCase;
 import com.sifamo.order.application.port.out.OrderRepositoryPort;
 import com.sifamo.order.domain.model.Order;
 import com.sifamo.order.domain.model.OrderItem;
@@ -22,11 +23,11 @@ import java.util.UUID;
 import com.sifamo.order.application.port.out.CustomerValidationPort;
 
 @Service
-public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCase, GetOrderUseCase {
+public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCase, GetOrderUseCase, UpdateOrderStatusUseCase {
 
     private final OrderRepositoryPort orderRepositoryPort;
     private final CustomerValidationPort customerValidationPort;
-
+    
     public OrderUseCaseService(OrderRepositoryPort orderRepositoryPort, CustomerValidationPort customerValidationPort) {
         this.orderRepositoryPort = orderRepositoryPort;
         this.customerValidationPort = customerValidationPort;
@@ -83,5 +84,12 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
                 command.productId(),
                 command.quantity()
         );
+    }
+    
+    @Override
+    @Transactional
+    public Optional<Order> updateStatus(UUID orderId, OrderStatus newStatus) {
+        return orderRepositoryPort.findById(orderId)
+                .map(order -> orderRepositoryPort.save(order.withStatus(newStatus)));
     }
 }

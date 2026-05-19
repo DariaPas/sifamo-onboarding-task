@@ -51,5 +51,16 @@ public class Order {
     public List<OrderItem> getItems() {
         return items;
     }
+    
+    public Order withStatus(OrderStatus newStatus) {
+        return new Order(
+                this.id,
+                this.customerId,
+                this.shippingAddressId,
+                newStatus,
+                this.createdAt,
+                this.items
+        );
+    }
 
 }

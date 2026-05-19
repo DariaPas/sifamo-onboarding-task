@@ -11,6 +11,7 @@ import com.sifamo.order.application.port.in.CreateOrderItemCommand;
 import com.sifamo.order.application.port.in.CreateOrderUseCase;
 import com.sifamo.order.application.port.in.GetOrderUseCase;
 import com.sifamo.order.application.port.in.ListOrdersUseCase;
+import com.sifamo.order.application.port.in.UpdateOrderStatusUseCase;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,15 +25,18 @@ public class OrderController implements DefaultApi {
 	private final CreateOrderUseCase createOrderUseCase;
     private final ListOrdersUseCase listOrdersUseCase;
     private final GetOrderUseCase getOrderUseCase;
+    private final UpdateOrderStatusUseCase updateOrderStatusUseCase;
     
     public OrderController(
             CreateOrderUseCase createOrderUseCase,
             ListOrdersUseCase listOrdersUseCase,
-            GetOrderUseCase getOrderUseCase
+            GetOrderUseCase getOrderUseCase,
+            UpdateOrderStatusUseCase updateOrderStatusUseCase
     ) {
         this.createOrderUseCase = createOrderUseCase;
         this.listOrdersUseCase = listOrdersUseCase;
         this.getOrderUseCase = getOrderUseCase;
+        this.updateOrderStatusUseCase = updateOrderStatusUseCase;
     }
 
     @Override
@@ -69,8 +73,13 @@ public class OrderController implements DefaultApi {
     }
 
     @Override
-    public ResponseEntity<Order> ordersIdStatusPatch(UUID id, UpdateStatusRequest updateStatusRequest) {
-    	return ResponseEntity.notFound().build();
+    public ResponseEntity<Order> ordersIdStatusPatch(UUID id, UpdateStatusRequest request) {
+    	 com.sifamo.order.domain.model.OrderStatus newStatus =
+    	            com.sifamo.order.domain.model.OrderStatus.valueOf(request.getStatus().name());
+
+    	    return updateOrderStatusUseCase.updateStatus(id, newStatus)
+    	            .map(order -> ResponseEntity.ok(toApiOrder(order)))
+    	            .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     
