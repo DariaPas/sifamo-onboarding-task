@@ -3,6 +3,16 @@ server:
 spring:
   application:
     name: order-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sifamo_onboarding
+    username: order_app
+    password: order_password
 
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: order_schema
+    open-in-view: false
+
