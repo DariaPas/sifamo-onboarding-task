@@ -164,8 +164,10 @@ components:
       properties:
         firstName:
           type: string
+          minLength: 1
         lastName:
           type: string
+          minLength: 1
         email:
           type: string
           format: email
@@ -203,12 +205,17 @@ components:
       properties:
         street:
           type: string
+          minLength: 1
         city:
           type: string
+          minLength: 1
         postalCode:
           type: string
+          minLength: 1
         country:
           type: string
+          minLength: 2
+          maxLength: 2
 
     ShippingAddress:
       type: object
@@ -241,9 +248,14 @@ components:
       properties:
         street:
           type: string
+          minLength: 1
         city:
           type: string
+          minLength: 1
         postalCode:
           type: string
+          minLength: 1
         country:
           type: string
+          minLength: 2
+          maxLength: 2
