@@ -21,16 +21,21 @@ import java.util.UUID;
 
 
 import com.sifamo.order.application.port.out.CustomerValidationPort;
+import com.sifamo.order.application.port.out.OrderEventPublisherPort;
+import com.sifamo.order.domain.event.OrderEvent;
 
 @Service
 public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCase, GetOrderUseCase, UpdateOrderStatusUseCase {
 
     private final OrderRepositoryPort orderRepositoryPort;
     private final CustomerValidationPort customerValidationPort;
+    private final OrderEventPublisherPort orderEventPublisherPort;
     
-    public OrderUseCaseService(OrderRepositoryPort orderRepositoryPort, CustomerValidationPort customerValidationPort) {
+    public OrderUseCaseService(OrderRepositoryPort orderRepositoryPort, CustomerValidationPort customerValidationPort,
+    		OrderEventPublisherPort orderEventPublisherPort) {
         this.orderRepositoryPort = orderRepositoryPort;
         this.customerValidationPort = customerValidationPort;
+        this.orderEventPublisherPort = orderEventPublisherPort;
     }
 
     @Override
@@ -58,8 +63,18 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
                 OffsetDateTime.now(ZoneOffset.UTC),
                 items
         );
+        
+        Order savedOrder = orderRepositoryPort.save(order);
 
-        return orderRepositoryPort.save(order);
+        orderEventPublisherPort.publish(new OrderEvent(
+                savedOrder.getId(),
+                savedOrder.getCustomerId(),
+                "OrderCreated",
+                savedOrder.getStatus().name(),
+                OffsetDateTime.now(ZoneOffset.UTC)
+        ));
+
+        return savedOrder;
     }
 
     @Override
@@ -89,7 +104,24 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
     @Override
     @Transactional
     public Optional<Order> updateStatus(UUID orderId, OrderStatus newStatus) {
-        return orderRepositoryPort.findById(orderId)
-                .map(order -> orderRepositoryPort.save(order.withStatus(newStatus)));
-    }
+    	return orderRepositoryPort.findById(orderId)
+                .map(order -> {
+                    Order updatedOrder = orderRepositoryPort.save(order.withStatus(newStatus));
+
+                    String eventType = switch (newStatus) {
+                        case SHIPPED -> "OrderShipped";
+                        case CANCELLED -> "OrderCancelled";
+                        default -> "OrderStatusUpdated";
+                    };
+
+                    orderEventPublisherPort.publish(new OrderEvent(
+                            updatedOrder.getId(),
+                            updatedOrder.getCustomerId(),
+                            eventType,
+                            updatedOrder.getStatus().name(),
+                            OffsetDateTime.now(ZoneOffset.UTC)
+                    ));
+
+                    return updatedOrder;
+                });    }
 }
