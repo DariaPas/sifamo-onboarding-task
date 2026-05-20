@@ -1,6 +1,7 @@
 package com.sifamo.customer.infrastructure.adapter.in.web;
 
-import com.sifamo.customer.api.DefaultApi;
+import com.sifamo.customer.api.CustomersApi;
+import com.sifamo.customer.api.ShippingAddressesApi;
 import com.sifamo.customer.api.model.BillingAddress;
 import com.sifamo.customer.api.model.Customer;
 import com.sifamo.customer.api.model.CreateCustomerRequest;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-public class CustomerController implements DefaultApi {
+public class CustomerController implements CustomersApi, ShippingAddressesApi {
 	
 	 private final CreateCustomerUseCase createCustomerUseCase;
 	 private final ListCustomersUseCase listCustomersUseCase;

@@ -3,10 +3,17 @@ openapi: 3.0.3
 info:
   title: Customer Service API
   version: 1.0.0
+tags:
+  - name: Customers
+    description: Customer management
+  - name: ShippingAddresses
+    description: Customer shipping address management
 
 paths:
   /customers:
     get:
+      tags:
+        - Customers
       summary: List all customers
       responses:
         '200':
@@ -19,6 +26,8 @@ paths:
                   $ref: '#/components/schemas/Customer'
 
     post:
+      tags:
+        - Customers
       summary: Create a new customer
       requestBody:
         required: true
@@ -38,6 +47,8 @@ paths:
 
   /customers/{id}:
     get:
+      tags:
+        - Customers
       summary: Get customer details
       parameters:
         - name: id
@@ -58,6 +69,8 @@ paths:
 
   /customers/{id}/shipping-addresses:
     get:
+      tags:
+        - ShippingAddresses
       summary: List shipping addresses of a customer
       parameters:
         - name: id
@@ -79,6 +92,8 @@ paths:
           description: Customer not found
 
     post:
+      tags:
+        - ShippingAddresses
       summary: Add shipping address to customer
       parameters:
         - name: id
@@ -106,6 +121,8 @@ paths:
           description: Customer not found
   /customers/{id}/shipping-addresses/{shippingAddressId}:
     get:
+      tags:
+        - ShippingAddresses
       summary: Verify a specific shipping address for a customer
       parameters:
         - name: id

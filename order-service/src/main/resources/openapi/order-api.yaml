@@ -3,10 +3,15 @@ info:
   title: Order Service API
   version: 1.0.0
   description: API for managing the order lifecycle and event-driven processing.
+tags:
+  - name: Orders
+    description: Order management
 
 paths:
   /orders:
     post:
+      tags:
+        - Orders
       summary: Create a new order
       description: |
         Creates a new order. Requires a valid customerId and shipping addressId.
@@ -38,6 +43,8 @@ paths:
           description: Customer or address not found
 
     get:
+      tags:
+        - Orders
       summary: List all orders
       parameters:
         - name: customerId
@@ -58,6 +65,8 @@ paths:
 
   /orders/{id}:
     get:
+      tags:
+        - Orders
       summary: Get order details
       parameters:
         - name: id
@@ -78,6 +87,8 @@ paths:
 
   /orders/{id}/status:
     patch:
+      tags:
+        - Orders
       summary: Update order status
       description: Transitions status between created, shipped, or cancelled. Triggers a Kafka event.
       parameters:

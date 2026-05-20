@@ -1,6 +1,6 @@
 package com.sifamo.order.infrastructure.adapter.in.web;
 
-import com.sifamo.order.api.DefaultApi;
+import com.sifamo.order.api.OrdersApi;
 import com.sifamo.order.api.model.CreateOrderItemRequest;
 import com.sifamo.order.api.model.CreateOrderRequest;
 import com.sifamo.order.api.model.Order;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-public class OrderController implements DefaultApi {
+public class OrderController implements OrdersApi {
 	
 	private final CreateOrderUseCase createOrderUseCase;
     private final ListOrdersUseCase listOrdersUseCase;
