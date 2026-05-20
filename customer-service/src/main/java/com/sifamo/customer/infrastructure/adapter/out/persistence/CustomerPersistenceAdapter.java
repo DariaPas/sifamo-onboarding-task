@@ -1,6 +1,7 @@
 package com.sifamo.customer.infrastructure.adapter.out.persistence;
 
 import com.sifamo.customer.application.port.out.CustomerRepositoryPort;
+import com.sifamo.customer.domain.exception.CustomerNotFoundException;
 import com.sifamo.customer.domain.model.BillingAddress;
 import com.sifamo.customer.domain.model.Customer;
 import com.sifamo.customer.domain.model.ShippingAddress;
@@ -47,7 +48,7 @@ public class CustomerPersistenceAdapter implements CustomerRepositoryPort {
     @Override
     public ShippingAddress saveShippingAddress(UUID customerId, ShippingAddress shippingAddress) {
         CustomerJpaEntity customerEntity = springDataCustomerRepository.findById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + customerId));
+                .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
         ShippingAddressJpaEntity shippingAddressEntity = toJpaEntity(shippingAddress);
         shippingAddressEntity.setCustomer(customerEntity);
