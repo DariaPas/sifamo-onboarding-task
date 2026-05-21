@@ -23,8 +23,14 @@ public class NotificationUseCaseService implements HandleOrderEventUseCase {
     @Override
     @Transactional
     public void handle(OrderEvent event) {
+    	
+    	if (notificationRepositoryPort.existsByEventId(event.eventId())) {
+            System.out.println("Notification already processed for eventId: " + event.eventId());
+            return;
+        }
         Notification notification = new Notification(
                 UUID.randomUUID(),
+                event.eventId(),
                 event.orderId(),
                 event.customerId(),
                 event.eventType(),

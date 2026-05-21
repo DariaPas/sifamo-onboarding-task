@@ -4,16 +4,22 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "notifications", schema = "notification_schema")
+@Table(name = "notifications", schema = "notification_schema", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_notifications_event_id", columnNames = "event_id")
+})
 public class NotificationJpaEntity {
 
     @Id
     private UUID id;
+    
+    @Column(name = "event_id", nullable = false)
+    private UUID eventId;
 
     @Column(nullable = false)
     private UUID orderId;
@@ -35,6 +41,7 @@ public class NotificationJpaEntity {
 
     public NotificationJpaEntity(
             UUID id,
+            UUID eventId,
             UUID orderId,
             UUID customerId,
             String eventType,
@@ -42,6 +49,7 @@ public class NotificationJpaEntity {
             OffsetDateTime receivedAt
     ) {
         this.id = id;
+        this.eventId = eventId;
         this.orderId = orderId;
         this.customerId = customerId;
         this.eventType = eventType;
@@ -51,6 +59,10 @@ public class NotificationJpaEntity {
 
     public UUID getId() {
         return id;
+    }
+    
+    public UUID getEventId() {
+        return eventId;
     }
 
     public UUID getOrderId() {

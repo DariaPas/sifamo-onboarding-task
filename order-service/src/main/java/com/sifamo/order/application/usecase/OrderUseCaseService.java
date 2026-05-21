@@ -67,6 +67,7 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
         Order savedOrder = orderRepositoryPort.save(order);
 
         orderEventPublisherPort.publish(new OrderEvent(
+        		UUID.randomUUID(),
                 savedOrder.getId(),
                 savedOrder.getCustomerId(),
                 "OrderCreated",
@@ -106,6 +107,9 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
     public Optional<Order> updateStatus(UUID orderId, OrderStatus newStatus) {
     	return orderRepositoryPort.findById(orderId)
                 .map(order -> {
+                	 if (order.getStatus() == newStatus) {
+                         return order;
+                     }
                     Order updatedOrder = orderRepositoryPort.save(order.withStatus(newStatus));
 
                     String eventType = switch (newStatus) {
@@ -115,6 +119,7 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
                     };
 
                     orderEventPublisherPort.publish(new OrderEvent(
+                    		UUID.randomUUID(),
                             updatedOrder.getId(),
                             updatedOrder.getCustomerId(),
                             eventType,

@@ -6,14 +6,16 @@ import java.util.UUID;
 public class Notification {
 
     private final UUID id;
+    private final UUID eventId;
     private final UUID orderId;
     private final UUID customerId;
     private final String eventType;
     private final String status;
     private final OffsetDateTime receivedAt;
 
-    public Notification(UUID id, UUID orderId, UUID customerId, String eventType, String status, OffsetDateTime receivedAt) {
+    public Notification(UUID id, UUID eventId, UUID orderId, UUID customerId, String eventType, String status, OffsetDateTime receivedAt) {
         this.id = id;
+        this.eventId = eventId;
         this.orderId = orderId;
         this.customerId = customerId;
         this.eventType = eventType;
@@ -23,6 +25,10 @@ public class Notification {
 
     public UUID getId() {
         return id;
+    }
+    
+    public UUID getEventId() {
+        return eventId;
     }
 
     public UUID getOrderId() {
