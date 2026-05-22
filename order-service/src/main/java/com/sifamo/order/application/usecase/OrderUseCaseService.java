@@ -110,6 +110,12 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
                 	 if (order.getStatus() == newStatus) {
                          return order;
                      }
+                	 if (!isValidTransition(order.getStatus(), newStatus)) {
+                         throw new IllegalArgumentException(
+                                 "Invalid order status transition: " + order.getStatus() + " -> " + newStatus
+                         );
+                     }
+
                     Order updatedOrder = orderRepositoryPort.save(order.withStatus(newStatus));
 
                     String eventType = switch (newStatus) {
@@ -130,4 +136,14 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
 
                     return updatedOrder;
                 });    }
+    
+    private boolean isValidTransition(OrderStatus currentStatus, OrderStatus newStatus) {
+        return switch (currentStatus) {
+            case CREATED -> newStatus == OrderStatus.CONFIRMED
+                    || newStatus == OrderStatus.CANCELLED;
+            case CONFIRMED -> newStatus == OrderStatus.SHIPPED
+                    || newStatus == OrderStatus.CANCELLED;
+            case SHIPPED, CANCELLED -> false;
+        };
+    }
 }
