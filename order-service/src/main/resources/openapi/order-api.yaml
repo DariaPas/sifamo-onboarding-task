@@ -209,5 +209,6 @@ components:
       type: string
       enum:
         - CREATED
+        - CONFIRMED
         - SHIPPED
         - CANCELLED

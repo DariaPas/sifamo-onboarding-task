@@ -113,6 +113,7 @@ public class OrderUseCaseService implements CreateOrderUseCase, ListOrdersUseCas
                     Order updatedOrder = orderRepositoryPort.save(order.withStatus(newStatus));
 
                     String eventType = switch (newStatus) {
+                    	case CONFIRMED -> "OrderConfirmed";
                         case SHIPPED -> "OrderShipped";
                         case CANCELLED -> "OrderCancelled";
                         default -> "OrderStatusUpdated";
