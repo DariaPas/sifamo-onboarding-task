@@ -288,15 +288,6 @@ On Windows PowerShell:
 .\mvnw test
 ```
 
-The tests use `MockMvc` and mocked use cases. They test the web layer only:
-
-```text
-HTTP request
--> CustomerController
--> mocked use case
--> HTTP response
-```
-
 ### Test: GET /customers
 
 This test calls:
@@ -326,7 +317,7 @@ Expected result:
 201 Created
 ```
 
-The mocked `CreateCustomerUseCase` returns a created customer.
+The `CreateCustomerUseCase` returns a created customer.
 
 The test checks that the response contains:
 
@@ -356,85 +347,6 @@ Expected result:
 
 ```text
 400 Bad Request
-```
-
-This proves that request validation works and invalid input is rejected before the use case creates a customer.
-
-## Database Access From Docker
-
-Open PostgreSQL inside the Docker container:
-
-```bash
-docker exec -it sifamo-postgres psql -U postgres -d sifamo_onboarding
-```
-
-List schemas:
-
-```sql
-\dn
-```
-
-List Customer Service tables:
-
-```sql
-\dt customer_schema.*
-```
-
-
-## Database
-
-Customer Service stores data in PostgreSQL schema:
-
-```text
-customer_schema
-```
-
-Main tables:
-
-```text
-customers
-billing_addresses
-shipping_addresses
-```
-
-Customer Service should only access `customer_schema`.
-
-Useful database checks:
-
-```sql
-SELECT *
-FROM customer_schema.customers;
-```
-
-```sql
-SELECT *
-FROM customer_schema.shipping_addresses;
-```
-
-Customer Service owns only this schema:
-
-```text
-customer_schema
-```
-
-Other service users should not be able to read Customer Service tables directly.
-
-Example: switch to the Order Service database user:
-
-```sql
-SET ROLE order_app;
-```
-
-Try to read Customer Service data:
-
-```sql
-SELECT * FROM customer_schema.customers;
-```
-
-Expected result:
-
-```text
-ERROR:  permission denied for schema customer_schema
 ```
 
 ## OpenAPI
