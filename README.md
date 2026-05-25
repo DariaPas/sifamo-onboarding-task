@@ -303,6 +303,17 @@ Service-specific OpenAPI details are described in the service READMEs.
 
 ## Known Limitations and Future Improvements
 
+### Duplicate Shipping Address Detection
+
+Currently a customer can have multiple shipping addresses, and the service allows the same address values to be added more than once.
+
+Example:
+
+```text
+Shipping Street 20, Berlin, 10115, DE
+Shipping Street 20, Berlin, 10115, DE
+```
+
 ### Replace `ddl-auto:update` with Flyway
 
 Currently the services use Hibernate `ddl-auto:update` for local development.
