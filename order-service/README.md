@@ -505,7 +505,7 @@ This proves that the controller accepts a valid status update and returns the up
 This test simulates an invalid status transition:
 
 ```text
-SHIPPED -> CREATED
+CONFIRMED -> CREATED
 ```
 
 The mocked `UpdateOrderStatusUseCase` throws an exception.
