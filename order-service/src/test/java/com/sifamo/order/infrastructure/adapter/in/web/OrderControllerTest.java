@@ -160,7 +160,7 @@ class OrderControllerTest {
         UUID orderId = UUID.fromString("6003245d-23b6-4065-af21-2aeb71357a43");
 
         when(updateOrderStatusUseCase.updateStatus(eq(orderId), eq(OrderStatus.CREATED)))
-                .thenThrow(new IllegalArgumentException("Invalid order status transition: SHIPPED -> CREATED"));
+                .thenThrow(new IllegalArgumentException("Invalid order status transition: CONFIRMED -> CREATED"));
 
         String body = """
                 {
